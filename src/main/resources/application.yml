@@ -23,3 +23,9 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: true
+  kafka:
+    bootstrap-servers: localhost:9092, localhost:9093, localhost:9094
+    producer:
+      batch-size: 5 # Default:16384
+      properties:
+        linger.ms: 5000 # Default 0

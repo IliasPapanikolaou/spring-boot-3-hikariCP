@@ -27,8 +27,14 @@ public class StudentController {
         return ResponseEntity.of(studentService.findStudentByName(lastname));
     }
 
-    @PostMapping
+    //@PostMapping
     public ResponseEntity<StudentDto> saveStudent(@RequestBody StudentDto studentDto) {
         return ResponseEntity.ok(studentService.saveStudent(studentDto));
+    }
+
+    @PostMapping
+    public ResponseEntity<String> saveStudentViaKafka(@RequestBody StudentDto studentDto) {
+        studentService.saveStudentViaKafka(studentDto);
+        return ResponseEntity.ok("Message sent");
     }
 }

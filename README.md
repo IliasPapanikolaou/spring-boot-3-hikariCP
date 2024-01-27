@@ -10,7 +10,7 @@ Save  Student: POST request: localhost:8080/api/student
 }
 ```
 
-```bash
+```shell
 for ($i = 1; $i -le 100; $i++) {
     Write-Host "Iteration $i"
     curl http://localhost:8080/api/student
