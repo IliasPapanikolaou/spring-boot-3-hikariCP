@@ -11,6 +11,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.util.backoff.BackOff;
+import org.springframework.util.backoff.ExponentialBackOff;
 import org.springframework.util.backoff.FixedBackOff;
 
 import java.net.SocketTimeoutException;
@@ -59,10 +60,11 @@ public class KafkaConsumerConfig {
 
     @Bean
     public DefaultErrorHandler errorHandler() {
-        BackOff fixedBackOff = new FixedBackOff(interval, maxAttempts);
+        // BackOff fixedBackOff = new FixedBackOff(interval, maxAttempts);
+        BackOff exponentialBackOff = new ExponentialBackOff(interval, 1.5);
         DefaultErrorHandler errorHandler = new DefaultErrorHandler((consumerRecord, ex) -> {
             // Logic to execute when all the retry attempts are exhausted
-        }, fixedBackOff);
+        }, /*fixedBackOff*/ exponentialBackOff);
         // We can specify which exceptions are retryable and which are non-retryable
         // If we don't set any retryable exceptions, the default set of retryable exceptions will be used:
         // MessagingException, RetryableException, ListenerExecutionFailedException

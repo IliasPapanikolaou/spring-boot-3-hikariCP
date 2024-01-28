@@ -7,8 +7,11 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.listener.ListenerExecutionFailedException;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
+
+import java.net.SocketTimeoutException;
 
 @Component
 public class KafkaMessageConsumer {
@@ -23,7 +26,7 @@ public class KafkaMessageConsumer {
 
     // Simple Kafka Consumer with manual Acknowledgments
     @KafkaListener(topics = "student-topic", groupId = "group-1", containerFactory = "manualAckKafkaListenerContainerFactory")
-    public void listenerManualAcks(ConsumerRecord<String, String> record, Acknowledgment acknowledgment) {
+    public void listenerManualAcks(ConsumerRecord<String, String> record, Acknowledgment acknowledgment) throws SocketTimeoutException {
         try {
             String message = record.value();
             log.info("Received message [{}] in group-1", message);
@@ -46,13 +49,16 @@ public class KafkaMessageConsumer {
             // Store to Database
             studentService.saveStudent(studentDto);
 
-            log.warn("--- Warning! Process won't reach to this point, thus no Acks will committed ---");
+            log.warn("--- Warning! In case of error, process won't reach to this point, thus no Acks will committed ---");
 
             // Acknowledge
             acknowledgment.acknowledge();
         } catch (Exception ex) {
             log.error("Error during processing the message: [{}]: {}", record.value(), ex.getMessage());
             // Handle error here - send to fallback mechanism
+
+            // Intended throw exception in order to engage retry mechanism
+            throw new ListenerExecutionFailedException(ex.getMessage());
         } finally {
             // Always Acknowledge
             // acknowledgment.acknowledge();
