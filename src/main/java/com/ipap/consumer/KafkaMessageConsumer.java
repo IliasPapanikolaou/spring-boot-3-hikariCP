@@ -57,6 +57,8 @@ public class KafkaMessageConsumer {
             log.error("Error during processing the message: [{}]: {}", record.value(), ex.getMessage());
             // Handle error here - send to fallback mechanism
 
+            // Code here
+
             // Intended throw exception in order to engage retry mechanism
             throw new ListenerExecutionFailedException(ex.getMessage());
         } finally {
